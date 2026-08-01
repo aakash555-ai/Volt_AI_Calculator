@@ -37,29 +37,51 @@ class HomeScreen(Screen):
 
         self.add_widget(layout)
 
+        self.update_display()
+
     def update_display(self):
-        self.display.set_expression(self.expression)
 
         if self.expression == "":
-            self.display.set_result("0")
+            self.display.clear()
         else:
+            self.display.set_expression(self.expression)
             self.display.set_result(self.expression)
+
+    def calculate_result(self):
+
+        try:
+            exp = (
+                self.expression
+                .replace("×", "*")
+                .replace("÷", "/")
+            )
+
+            return str(eval(exp))
+
+        except Exception:
+            return None
 
     def button_pressed(self, value):
 
+        operators = ["+", "-", "×", "÷"]
+
         # ---------------- AC ----------------
+
         if value == "AC":
             self.expression = ""
-            self.update_display()
+            self.display.clear()
             return
 
-        # ---------------- DELETE ----------------
+        # ---------------- DEL ----------------
+
         if value == "DEL":
+
             self.expression = self.expression[:-1]
             self.update_display()
             return
 
-        # ---------------- PLUS / MINUS ----------------
+        # ---------------- ± ----------------
+
         if value == "±":
 
             if self.expression == "":
@@ -73,7 +95,8 @@ class HomeScreen(Screen):
             self.update_display()
             return
 
-        # ---------------- PERCENT ----------------
+        # ---------------- % ----------------
+
         if value == "%":
 
             try:
@@ -82,33 +105,30 @@ class HomeScreen(Screen):
                 self.expression = str(number)
                 self.update_display()
 
-            except:
+            except Exception:
                 self.expression = ""
-                self.display.set_expression("")
-                self.display.set_result("Error")
+                self.display.show_error()
 
             return
 
-        # ---------------- DECIMAL ----------------
+        # ---------------- Decimal ----------------
+
         if value == ".":
 
-            # Empty expression -> start with 0.
             if self.expression == "":
                 self.expression = "0."
                 self.update_display()
                 return
 
-            # Prevent multiple decimals in current number
-            last_number = self.expression.split("+")[-1]
-            last_number = last_number.split("-")[-1]
-            last_number = last_number.split("×")[-1]
-            last_number = last_number.split("÷")[-1]
+            last = self.expression
 
-            if "." in last_number:
+            for op in operators:
+                last = last.split(op)[-1]
+
+            if "." in last:
                 return
 
-        # ---------------- OPERATORS ----------------
-        operators = ["+", "-", "×", "÷"]
+        # ---------------- Operators ----------------
 
         if value in operators:
 
@@ -118,32 +138,23 @@ class HomeScreen(Screen):
             if self.expression[-1] in operators:
                 self.expression = self.expression[:-1]
 
-        # ---------------- EQUAL ----------------
+        # ---------------- Equal ----------------
+
         if value == "=":
 
-            try:
+            result = self.calculate_result()
 
-                exp = (
-                    self.expression
-                    .replace("×", "*")
-                    .replace("÷", "/")
-                )
-
-                result = str(eval(exp))
-
+            if result is None:
+                self.expression = ""
+                self.display.show_error()
+            else:
                 self.display.set_expression(self.expression)
                 self.display.set_result(result)
-
                 self.expression = result
-
-            except:
-
-                self.expression = ""
-                self.display.set_expression("")
-                self.display.set_result("Error")
 
             return
 
-        # ---------------- DEFAULT ----------------
+        # ---------------- Default ----------------
+
         self.expression += value
         self.update_display()

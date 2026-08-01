@@ -8,43 +8,58 @@ class DisplayPanel(BoxLayout):
         super().__init__(**kwargs)
 
         self.orientation = "vertical"
-        self.spacing = 10
+        self.spacing = 5
+        self.padding = (10, 10)
 
-        # Top Expression
+        # Expression (Top)
         self.expression = Label(
             text="",
-            font_size=24,
+            font_size=22,
             halign="right",
             valign="middle",
             size_hint=(1, 0.35),
-            color=(0.7, 0.7, 0.7, 1)
+            color=(0.70, 0.70, 0.70, 1),
         )
 
-        # Bottom Result
+        # Result (Bottom)
         self.result = Label(
             text="0",
-            font_size=52,
+            font_size=54,
             bold=True,
             halign="right",
             valign="middle",
             size_hint=(1, 0.65),
-            color=(1, 1, 1, 1)
+            color=(1, 1, 1, 1),
         )
 
-        self.expression.bind(size=self.update_expression_size)
-        self.result.bind(size=self.update_result_size)
+        self.expression.bind(size=self._update_expression)
+        self.result.bind(size=self._update_result)
 
         self.add_widget(self.expression)
         self.add_widget(self.result)
 
-    def update_expression_size(self, *args):
-        self.expression.text_size = (self.expression.width - 30, self.expression.height)
+    def _update_expression(self, *args):
+        self.expression.text_size = (
+            self.expression.width - 20,
+            self.expression.height,
+        )
 
-    def update_result_size(self, *args):
-        self.result.text_size = (self.result.width - 30, self.result.height)
+    def _update_result(self, *args):
+        self.result.text_size = (
+            self.result.width - 20,
+            self.result.height,
+        )
 
-    def set_expression(self, text):
-        self.expression.text = text
+    def set_expression(self, value):
+        self.expression.text = str(value)
 
-    def set_result(self, text):
-        self.result.text = text
+    def set_result(self, value):
+        self.result.text = str(value)
+
+    def clear(self):
+        self.expression.text = ""
+        self.result.text = "0"
+
+    def show_error(self):
+        self.expression.text = ""
+        self.result.text = "Error"
