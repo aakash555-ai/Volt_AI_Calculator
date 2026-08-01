@@ -13,17 +13,19 @@ class Keypad(GridLayout):
         self.size_hint = (1, 0.75)
 
         buttons = [
-            "C", "±", "%", "÷",
+            "AC", "DEL", "%", "÷",
             "7", "8", "9", "×",
             "4", "5", "6", "-",
             "1", "2", "3", "+",
-            "AI", "0", ".", "="
+            "±", "0", ".", "="
         ]
 
         for text in buttons:
             btn = CalculatorButton(text=text)
 
             if button_callback:
-                btn.bind(on_press=lambda instance, value=text: button_callback(value))
+                btn.bind(
+                    on_press=lambda instance, value=text: button_callback(value)
+                )
 
             self.add_widget(btn)

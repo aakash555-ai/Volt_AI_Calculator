@@ -3,7 +3,7 @@ from kivy.uix.boxlayout import BoxLayout
 
 from kivymd.uix.card import MDCard
 
-from widgets.display import Display
+from widgets.display_panel import DisplayPanel
 from widgets.keypad import Keypad
 
 
@@ -27,7 +27,7 @@ class HomeScreen(Screen):
             size_hint=(1, 0.25)
         )
 
-        self.display = Display()
+        self.display = DisplayPanel()
         display_card.add_widget(self.display)
 
         self.keypad = Keypad(
@@ -39,27 +39,75 @@ class HomeScreen(Screen):
 
         self.add_widget(layout)
 
+    def update_display(self):
+        self.display.set_expression(self.expression)
+
+        if self.expression == "":
+            self.display.set_result("0")
+        else:
+            self.display.set_result(self.expression)
+
     def button_pressed(self, value):
 
-        if value == "C":
+        # ALL CLEAR
+        if value == "AC":
             self.expression = ""
-            self.display.text = "0"
+            self.update_display()
             return
 
+        # DELETE
+        if value == "DEL":
+            self.expression = self.expression[:-1]
+            self.update_display()
+            return
+
+        # PERCENT
+        if value == "%":
+            try:
+                number = float(self.expression)
+                number = number / 100
+                self.expression = str(number)
+            except:
+                self.expression = ""
+                self.display.set_result("Error")
+
+            self.update_display()
+            return
+
+        # PLUS / MINUS
+        if value == "±":
+
+            if self.expression.startswith("-"):
+                self.expression = self.expression[1:]
+            else:
+                self.expression = "-" + self.expression
+
+            self.update_display()
+            return
+
+        # EQUAL
         if value == "=":
             try:
-                exp = self.expression.replace("×", "*").replace("÷", "/")
+                exp = (
+                    self.expression
+                    .replace("×", "*")
+                    .replace("÷", "/")
+                )
+
                 result = str(eval(exp))
-                self.display.text = result
+
+                self.display.set_expression(self.expression)
+                self.display.set_result(result)
+
                 self.expression = result
-            except Exception:
-                self.display.text = "Error"
+
+            except:
                 self.expression = ""
+                self.display.set_expression("")
+                self.display.set_result("Error")
+
             return
 
-        if value == "AI":
-            self.display.text = "AI Soon 🚀"
-            return
-
+        # DEFAULT
         self.expression += value
-        self.display.text = self.expression
+        self.update_display()

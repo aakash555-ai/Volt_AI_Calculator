@@ -1,4 +1,11 @@
-from calculator.operations import add, subtract, multiply, divide
+from calculator.operations import (
+    add,
+    subtract,
+    multiply,
+    divide,
+    percentage,
+    negate,
+)
 
 
 class CalculatorEngine:
@@ -9,9 +16,13 @@ class CalculatorEngine:
             "-": subtract,
             "×": multiply,
             "÷": divide,
+            "%": percentage,
         }
 
     def calculate(self, a, b, operator):
+
+        if operator == "±":
+            return negate(a)
 
         if operator not in self.operations:
             return "Invalid"

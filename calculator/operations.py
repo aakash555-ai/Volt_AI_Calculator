@@ -14,3 +14,11 @@ def divide(a, b):
     if b == 0:
         return "Error"
     return a / b
+
+
+def percentage(a, b):
+    return (a * b) / 100
+
+
+def negate(a):
+    return -a
