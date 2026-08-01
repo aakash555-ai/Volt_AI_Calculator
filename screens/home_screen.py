@@ -1,6 +1,8 @@
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 
+from kivymd.uix.card import MDCard
+
 from widgets.display import Display
 from widgets.keypad import Keypad
 
@@ -14,14 +16,25 @@ class HomeScreen(Screen):
 
         layout = BoxLayout(
             orientation="vertical",
-            padding=15,
-            spacing=15
+            padding=20,
+            spacing=20
+        )
+
+        display_card = MDCard(
+            radius=[30],
+            elevation=4,
+            padding=25,
+            size_hint=(1, 0.25)
         )
 
         self.display = Display()
-        self.keypad = Keypad(button_callback=self.button_pressed)
+        display_card.add_widget(self.display)
 
-        layout.add_widget(self.display)
+        self.keypad = Keypad(
+            button_callback=self.button_pressed
+        )
+
+        layout.add_widget(display_card)
         layout.add_widget(self.keypad)
 
         self.add_widget(layout)

@@ -9,16 +9,16 @@ class Display(Label):
         self.text = "0"
 
         self.font_size = 52
-
         self.bold = True
 
         self.halign = "right"
-
         self.valign = "middle"
 
-        self.size_hint = (1, 0.25)
+        self.color = (1, 1, 1, 1)
+
+        self.size_hint = (1, 1)
 
         self.bind(size=self.update_text_size)
 
     def update_text_size(self, *args):
-        self.text_size = self.size
+        self.text_size = (self.width - 40, self.height)
