@@ -30,9 +30,7 @@ class HomeScreen(Screen):
         self.display = DisplayPanel()
         display_card.add_widget(self.display)
 
-        self.keypad = Keypad(
-            button_callback=self.button_pressed
-        )
+        self.keypad = Keypad(button_callback=self.button_pressed)
 
         layout.add_widget(display_card)
         layout.add_widget(self.keypad)
@@ -49,33 +47,23 @@ class HomeScreen(Screen):
 
     def button_pressed(self, value):
 
-        # ALL CLEAR
+        # ---------------- AC ----------------
         if value == "AC":
             self.expression = ""
             self.update_display()
             return
 
-        # DELETE
+        # ---------------- DELETE ----------------
         if value == "DEL":
             self.expression = self.expression[:-1]
             self.update_display()
             return
 
-        # PERCENT
-        if value == "%":
-            try:
-                number = float(self.expression)
-                number = number / 100
-                self.expression = str(number)
-            except:
-                self.expression = ""
-                self.display.set_result("Error")
-
-            self.update_display()
-            return
-
-        # PLUS / MINUS
+        # ---------------- PLUS / MINUS ----------------
         if value == "±":
+
+            if self.expression == "":
+                return
 
             if self.expression.startswith("-"):
                 self.expression = self.expression[1:]
@@ -85,9 +73,56 @@ class HomeScreen(Screen):
             self.update_display()
             return
 
-        # EQUAL
-        if value == "=":
+        # ---------------- PERCENT ----------------
+        if value == "%":
+
             try:
+                number = float(self.expression)
+                number = number / 100
+                self.expression = str(number)
+                self.update_display()
+
+            except:
+                self.expression = ""
+                self.display.set_expression("")
+                self.display.set_result("Error")
+
+            return
+
+        # ---------------- DECIMAL ----------------
+        if value == ".":
+
+            # Empty expression -> start with 0.
+            if self.expression == "":
+                self.expression = "0."
+                self.update_display()
+                return
+
+            # Prevent multiple decimals in current number
+            last_number = self.expression.split("+")[-1]
+            last_number = last_number.split("-")[-1]
+            last_number = last_number.split("×")[-1]
+            last_number = last_number.split("÷")[-1]
+
+            if "." in last_number:
+                return
+
+        # ---------------- OPERATORS ----------------
+        operators = ["+", "-", "×", "÷"]
+
+        if value in operators:
+
+            if self.expression == "":
+                return
+
+            if self.expression[-1] in operators:
+                self.expression = self.expression[:-1]
+
+        # ---------------- EQUAL ----------------
+        if value == "=":
+
+            try:
+
                 exp = (
                     self.expression
                     .replace("×", "*")
@@ -102,12 +137,13 @@ class HomeScreen(Screen):
                 self.expression = result
 
             except:
+
                 self.expression = ""
                 self.display.set_expression("")
                 self.display.set_result("Error")
 
             return
 
-        # DEFAULT
+        # ---------------- DEFAULT ----------------
         self.expression += value
         self.update_display()
